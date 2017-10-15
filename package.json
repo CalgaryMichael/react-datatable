@@ -1,0 +1,11 @@
+{
+  "name": "react-datatable",
+  "version": "0.0.1",
+  "description": "A react table that is automatically built from a JSON object",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Calgary Michael",
+  "license": "ISC"
+}
