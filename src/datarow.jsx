@@ -7,17 +7,33 @@ export default class DataRow extends React.Component {
     data: PropTypes.array.isRequired,
     onClick: PropTypes.func,
     colStyle: PropTypes.object,
-    rowStyle: PropTypes.object
+    rowStyle: PropTypes.object,
+    rowNum: PropTypes.number,
+    showRowNum: PropTypes.bool
+  }
+
+  static defaultProps = {
+    showRowNum: true
   }
 
   renderRow() {
-    return this.props.data.map((col, index) => {
+    let cols = [];
+    if (this.props.showRowNum) {
+      cols.push(<div key={0}>{this.props.rowNum}</div>);
+    }
+
+    cols.push(this.props.data.map((col, index) => {
+      let key = index;
+      if (this.props.showRowNum) {
+        key = index + 1;
+      }
       return (
-        <div key={index} style={this.props.colStyle}>
+        <div key={key} style={this.props.colStyle}>
           {col}
         </div>
       )
-    })
+    }));
+    return cols;
   }
 
   render() {

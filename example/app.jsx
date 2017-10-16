@@ -14,7 +14,8 @@ export default class App extends React.Component {
     return (
      <DataTable
        id='dt'
-       data={data} />
+       data={data}
+       showRowNum={true} />
    )
   }
 }

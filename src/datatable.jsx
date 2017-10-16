@@ -12,6 +12,7 @@ export default class DataTable extends React.Component {
     paginate: PropTypes.bool,
     pageLimit: PropTypes.number,
     onRowSelect: PropTypes.func,
+    showRowNum: PropTypes.bool,
     colStyle: PropTypes.object
   };
 
@@ -19,6 +20,7 @@ export default class DataTable extends React.Component {
     id: 'dt',
     paginate: false,
     pageLimit: 10,
+    showRowNum: true,
     colStyle: {
       display: 'table-cell',
       minWidth: '50px',
@@ -39,16 +41,32 @@ export default class DataTable extends React.Component {
     if (headings === null) {
       return null;
     }
-    return headings.map((head, index) => {
+    let headingList = [];
+    if (this.props.showRowNum) {
+      headingList.push(
+        <div key={0}
+             id={`heading-0`}
+             className={'dt-head'}
+             style={this.props.colStyle}>
+           <span>Row</span>
+        </div>
+      );
+    }
+    headingList.push(headings.map((head, index) => {
+      let key = index;
+      if (this.props.showRowNum) {
+        key = index + 1;
+      }
       return (
-        <div key={index}
-             id={`heading-${index}`}
+        <div key={key}
+             id={`heading-${key}`}
              className={'dt-head'}
              style={this.props.colStyle}>
           <span>{head}</span>
         </div>
       )
-    });
+    }));
+    return headingList;
   };
 
   rows () {
@@ -63,7 +81,9 @@ export default class DataTable extends React.Component {
           data={data}
           onClick={this.props.onRowSelect}
           rowStyle={this.rowStyle}
-          colStyle={this.props.colStyle} />
+          colStyle={this.props.colStyle}
+          rowNum={index}
+          showRowNum={this.props.showRowNum} />
       )
     });
   }
