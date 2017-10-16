@@ -36,40 +36,23 @@ export default class DataTable extends React.Component {
     display: 'table-row'
   }
 
-  headings () {
+  headings() {
     const headings = Parser.parseHeadings(this.props.data);
-    if (headings === null) {
+    if (headings == null) {
       return null;
     }
-    let headingList = [];
-    if (this.props.showRowNum) {
-      headingList.push(
-        <div key={0}
-             id={`heading-0`}
-             className={'dt-head'}
-             style={this.props.colStyle}>
-           <span>Row</span>
-        </div>
-      );
-    }
-    headingList.push(headings.map((head, index) => {
-      let key = index;
-      if (this.props.showRowNum) {
-        key = index + 1;
-      }
-      return (
-        <div key={key}
-             id={`heading-${key}`}
-             className={'dt-head'}
-             style={this.props.colStyle}>
-          <span>{head}</span>
-        </div>
-      )
-    }));
-    return headingList;
+
+    return (
+      <DataRow
+        data={headings}
+        isHeading={true}
+        rowStyle={this.rowStyle}
+        colStyle={this.props.colStyle}
+        showRowNum={this.props.showRowNum} />
+    )
   };
 
-  rows () {
+  rows() {
     const data = Parser.parseData(this.props.data);
     if (data == false) {
       return <span style={{textAlign: 'center'}}>No Data</span>;
@@ -94,9 +77,7 @@ export default class DataTable extends React.Component {
 
     return (
       <div id={this.props.id} className='dt-outer' style={this.outerBaseStyle}>
-        <div id={`${this.props.id}-headings`} style={this.rowStyle}>
-          {headings}
-        </div>
+        {headings}
         {rows}
       </div>
     )
