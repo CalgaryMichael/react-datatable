@@ -1,10 +1,20 @@
 import React from 'react';
+import DataTable from '../src/datatable.jsx';
 
 export default class App extends React.Component {
   render() {
+    const data = {
+      'headings': ['First Name', 'Last Name'],
+      'data': [
+        ['Miles', 'Davis'],
+        ['John', 'Coltrane'],
+        ['Ornette', 'Coleman'],
+      ]
+    }
     return (
-     <div style={{textAlign: 'center'}}>
-        <h1>Hello World</h1>
-      </div>);
+     <DataTable
+       id='dt'
+       data={data} />
+   )
   }
 }
