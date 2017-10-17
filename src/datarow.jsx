@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Styles from './styles.js';
 
 export default class DataRow extends React.Component {
   static propTypes = {
@@ -15,7 +16,17 @@ export default class DataRow extends React.Component {
 
   static defaultProps = {
     showRowNum: true,
-    isHeading: false
+    isHeading: false,
+    rowStyle: {},
+    colStyle: {}
+  }
+
+  getColStyle() {
+    return Object.assign({}, this.props.colStyle, Styles.baseCol);
+  }
+
+  getRowStyle() {
+    return Object.assign({}, this.props.rowStyle, Styles.baseRow);
   }
 
   rowModulus() {
@@ -28,6 +39,7 @@ export default class DataRow extends React.Component {
   }
 
   renderHeading() {
+    const colStyle = this.getColStyle();
     const getHeading = function (content, style, index) {
       return (
         <div key={index}
@@ -40,20 +52,18 @@ export default class DataRow extends React.Component {
     }
     let headingList = [];
     if (this.props.showRowNum) {
-      headingList.push(getHeading('Row', this.props.colStyle, 0));
+      headingList.push(getHeading('Row', colStyle, 0));
     }
 
     headingList.push(this.props.data.map((head, index) => {
-      let key = index;
-      if (this.props.showRowNum) {
-        key = index + 1;
-      }
-      return getHeading(head, this.props.colStyle, key);
+      const key = this.props.showRowNum ? index + 1 : index;
+      return getHeading(head, colStyle, key);
     }));
     return headingList;
   }
 
   renderRow() {
+    const colStyle = this.getColStyle();
     const getRow = function(content, style, index) {
       return (
         <div key={index} style={style}>
@@ -63,15 +73,12 @@ export default class DataRow extends React.Component {
     }
     let cols = [];
     if (this.props.showRowNum) {
-      cols.push(getRow((this.props.rowNum + 1), this.props.colStyle, 0));
+      cols.push(getRow(this.props.rowNum, colStyle, 0));
     }
 
     cols.push(this.props.data.map((col, index) => {
-      let key = index;
-      if (this.props.showRowNum) {
-        key = index + 1;
-      }
-      return getRow(col, this.props.colStyle, key);
+      const key = this.props.showRowNum ? index + 1 : index;
+      return getRow(col, colStyle, key);
     }));
     return cols;
   }
@@ -83,9 +90,12 @@ export default class DataRow extends React.Component {
       className = `dt-header`;
       row = this.renderHeading();
     }
-
+    let style = this.getRowStyle();
     return (
-      <div id={this.props.id} style={this.props.rowStyle} className={className}>
+      <div id={this.props.id}
+           style={style}
+           className={className}
+           onClick={this.props.onClick}>
         {row}
       </div>
     )
