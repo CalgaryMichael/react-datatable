@@ -36,14 +36,24 @@ export default class DataTable extends React.Component {
     colStyle: {}
   };
 
-  selectedRowStyle = {
-    display: 'table-row',
-    backgroundColor: 'blue',
-    color: 'white'
-  }
-
   getTableStyles() {
     return Object.assign({}, Styles.baseTable, this.props.baseTable);
+  }
+
+  getRowStyle() {
+    return Object.assign({}, this.props.rowStyle, Styles.baseRow);
+  }
+
+  getSelectedRowStyle() {
+    let selectedRowStyle = {
+      backgroundColor: 'blue',
+      color: 'white'
+    }
+    return Object.assign(selectedRowStyle, this.props.rowStyle, Styles.baseRow);
+  }
+
+  getColStyle() {
+    return Object.assign({}, this.props.colStyle, Styles.baseCol);
   }
 
   onSelect(rowNum) {
@@ -61,27 +71,28 @@ export default class DataTable extends React.Component {
       <DataRow
         data={headings}
         isHeading={true}
-        rowStyle={this.rowStyle}
-        colStyle={this.props.colStyle}
+        rowStyle={this.getRowStyle()}
+        colStyle={this.getColStyle()}
         showRowNum={this.props.showRowNum} />
     )
   };
 
   rows() {
+    const colStyle = this.getColStyle();
     const data = Parser.parseData(this.props.data);
     if (data == false) {
       return <span style={{textAlign: 'center'}}>No Data</span>;
     }
     return data.map((data, index) => {
       const key = this.props.showRowNum ? index + 1 : index;
-      const rowStyle = this.state.selectedRow == key ? this.selectedRowStyle : this.props.rowStyle;
+      const rowStyle = this.state.selectedRow == key ? this.getSelectedRowStyle() : this.getRowStyle();
       return (
         <DataRow
           key={index}
           data={data}
           onClick={() => this.onSelect(key)}
           rowStyle={rowStyle}
-          colStyle={this.props.colStyle}
+          colStyle={colStyle}
           rowNum={key}
           showRowNum={this.props.showRowNum} />
       )

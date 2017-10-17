@@ -21,14 +21,6 @@ export default class DataRow extends React.Component {
     colStyle: {}
   }
 
-  getColStyle() {
-    return Object.assign({}, this.props.colStyle, Styles.baseCol);
-  }
-
-  getRowStyle() {
-    return Object.assign({}, this.props.rowStyle, Styles.baseRow);
-  }
-
   rowModulus() {
     const modulus = ['even', 'odd'];
     let number = this.props.rowNum;
@@ -39,7 +31,7 @@ export default class DataRow extends React.Component {
   }
 
   renderHeading() {
-    const colStyle = this.getColStyle();
+    const style = this.props.colStyle;
     const getHeading = function (content, style, index) {
       return (
         <div key={index}
@@ -50,20 +42,21 @@ export default class DataRow extends React.Component {
         </div>
       )
     }
+    
     let headingList = [];
     if (this.props.showRowNum) {
-      headingList.push(getHeading('Row', colStyle, 0));
+      headingList.push(getHeading('Row', style, 0));
     }
 
     headingList.push(this.props.data.map((head, index) => {
       const key = this.props.showRowNum ? index + 1 : index;
-      return getHeading(head, colStyle, key);
+      return getHeading(head, style, key);
     }));
     return headingList;
   }
 
   renderRow() {
-    const colStyle = this.getColStyle();
+    const style = this.props.colStyle;
     const getRow = function(content, style, index) {
       return (
         <div key={index} style={style}>
@@ -73,12 +66,12 @@ export default class DataRow extends React.Component {
     }
     let cols = [];
     if (this.props.showRowNum) {
-      cols.push(getRow(this.props.rowNum, colStyle, 0));
+      cols.push(getRow(this.props.rowNum, style, 0));
     }
 
     cols.push(this.props.data.map((col, index) => {
       const key = this.props.showRowNum ? index + 1 : index;
-      return getRow(col, colStyle, key);
+      return getRow(col, style, key);
     }));
     return cols;
   }
@@ -90,10 +83,10 @@ export default class DataRow extends React.Component {
       className = `dt-header`;
       row = this.renderHeading();
     }
-    let style = this.getRowStyle();
+
     return (
       <div id={this.props.id}
-           style={style}
+           style={this.props.rowStyle}
            className={className}
            onClick={this.props.onClick}>
         {row}
