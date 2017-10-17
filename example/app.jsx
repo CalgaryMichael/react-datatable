@@ -9,6 +9,9 @@ export default class App extends React.Component {
         ['Miles', 'Davis'],
         ['John', 'Coltrane'],
         ['Ornette', 'Coleman'],
+        ['Nina', 'Simone'],
+        ['Sonny', 'Rollins'],
+        ['Kamasi', 'Washington']
       ]
     }
     return (
