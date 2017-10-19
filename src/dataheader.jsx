@@ -1,40 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Styles from './styles.js';
-import DataEntry from './dataentry.jsx';
+import DataEntry from './dataentry.jsx'
 
-export default class DataRow extends React.Component {
+export default class DataHeader extends React.Component {
   static propTypes = {
     id: PropTypes.string,
+    title: PropTypes.string,
     data: PropTypes.array.isRequired,
     onClick: PropTypes.func,
-    colStyle: PropTypes.object,
     rowStyle: PropTypes.object,
-    rowNum: PropTypes.number,
+    colStyle: PropTypes.object,
     showRowNum: PropTypes.bool
   }
 
   static defaultProps = {
-    showRowNum: true,
     rowStyle: {},
     colStyle: {}
-  }
-
-  rowModulus() {
-    const modulus = ['even', 'odd'];
-    let number = this.props.rowNum;
-    if (this.props.showRowNum) {
-      number += 1;
-    }
-    return modulus[number % 2];
   }
 
   renderEntry(content, index) {
     return (
       <DataEntry
         key={index}
-        id={`row-${this.props.rowNum}-col-${index}`}
-        className={`dt-entry`}
+        id={`heading-${index}`}
+        className={'dt-head'}
         style={this.props.colStyle}>
         {content}
       </DataEntry>
@@ -49,21 +38,20 @@ export default class DataRow extends React.Component {
   }
 
   render() {
-    const className = `dt-row dt-row-${this.rowModulus()}`;
     const row = this.renderRow();
     let numCol = null;
     if (this.props.showRowNum) {
-      numCol = this.renderEntry(this.props.rowNum, 0);
+      numCol = this.renderEntry('Row', 0);
     }
 
     return (
       <div id={this.props.id}
            style={this.props.rowStyle}
-           className={className}
+           className={'dt-heading-row'}
            onClick={this.props.onClick}>
         {numCol}
         {row}
       </div>
-    )
+    );
   }
 }

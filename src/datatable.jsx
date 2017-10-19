@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DataRow from './datarow.jsx';
+import DataHeader from './dataheader.jsx';
 import Parser from './parser.js';
 import Styles from './styles.js';
 
@@ -27,7 +28,6 @@ export default class DataTable extends React.Component {
   };
 
   static defaultProps = {
-    id: 'dt',
     paginate: false,
     pageLimit: 10,
     showRowNum: true,
@@ -37,7 +37,7 @@ export default class DataTable extends React.Component {
   };
 
   getTableStyles() {
-    return Object.assign({}, Styles.baseTable, this.props.baseTable);
+    return Object.assign({}, this.props.baseTable, Styles.baseTable);
   }
 
   getRowStyle() {
@@ -68,9 +68,8 @@ export default class DataTable extends React.Component {
     }
 
     return (
-      <DataRow
+      <DataHeader
         data={headings}
-        isHeading={true}
         rowStyle={this.getRowStyle()}
         colStyle={this.getColStyle()}
         showRowNum={this.props.showRowNum} />
@@ -101,12 +100,12 @@ export default class DataTable extends React.Component {
 
   render() {
     const style = this.getTableStyles();
-    const headings = this.headings();
+    const heading = this.headings();
     const rows = this.rows();
 
     return (
       <div id={this.props.id} className='dt-table' style={style}>
-        {headings}
+        {heading}
         {rows}
       </div>
     )
