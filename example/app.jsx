@@ -14,6 +14,7 @@ export default class App extends React.Component {
         ['Kamasi', 'Washington']
       ]
     }
+
     return (
      <DataTable
        id='dt'

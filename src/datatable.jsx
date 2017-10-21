@@ -9,7 +9,9 @@ export default class DataTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedRow: null
+      selectedRow: null,
+      sortedCol: 0,
+      sortDirection: 'asc'
     };
   }
 
@@ -56,9 +58,20 @@ export default class DataTable extends React.Component {
     return Object.assign({}, this.props.colStyle, Styles.baseCol);
   }
 
-  onSelect(rowNum) {
+  onSelect(rowNum, rowData) {
     this.setState({selectedRow: rowNum});
-    this.props.onRowSelect();
+    this.props.onRowSelect(rowNum, rowData);
+  }
+
+  onHeaderSelect(colIndex) {
+    let direction = 'asc';
+    if (this.state.sortedCol === colIndex && this.state.sortDirection === 'asc') {
+      direction = 'desc';
+    }
+    this.setState({
+      sortedCol: colIndex,
+      sortDirection: direction
+    });
   }
 
   headings() {
@@ -70,6 +83,7 @@ export default class DataTable extends React.Component {
     return (
       <DataHeader
         data={headings}
+        onClick={(index) => this.onHeaderSelect(index)}
         rowStyle={this.getRowStyle()}
         colStyle={this.getColStyle()}
         showRowNum={this.props.showRowNum} />
@@ -78,21 +92,21 @@ export default class DataTable extends React.Component {
 
   rows() {
     const colStyle = this.getColStyle();
-    const data = Parser.parseData(this.props.data);
+    const data = Parser.parseData(this.props.data, this.state.sortedCol, this.state.sortDirection);
     if (data == false) {
       return <span style={{textAlign: 'center'}}>No Data</span>;
     }
-    return data.map((data, index) => {
-      const key = this.props.showRowNum ? index + 1 : index;
-      const rowStyle = this.state.selectedRow == key ? this.getSelectedRowStyle() : this.getRowStyle();
+
+    return data.map((row, index) => {
+      const rowStyle = this.state.selectedRow == index ? this.getSelectedRowStyle() : this.getRowStyle();
       return (
         <DataRow
           key={index}
-          data={data}
-          onClick={() => this.onSelect(key)}
+          data={row}
+          onClick={() => this.onSelect(index, row)}
           rowStyle={rowStyle}
           colStyle={colStyle}
-          rowNum={key}
+          rowNum={index}
           showRowNum={this.props.showRowNum} />
       )
     });

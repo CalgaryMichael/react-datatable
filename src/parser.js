@@ -1,25 +1,46 @@
 const has = Object.prototype.hasOwnProperty;
 
 export default class Parser {
-  static parseData (dataObj) {
+  static parseData (dataObj, sortIndex=0, sortDirection='asc') {
+    function comparator (a, b) {
+      let indexA = a[sortIndex],
+          indexB = b[sortIndex];
+      if (indexA instanceof String) {
+        indexA = indexA.toLowerCase();
+      }
+      else if (indexB instanceof String) {
+        indexB = indexB.toLowerCase();
+      }
+
+      if (sortDirection === 'asc') {
+        if (indexA < indexB) return -1;
+        if (indexA > indexB) return 1;
+      }
+      else {
+        if (indexA < indexB) return 1;
+        if (indexA > indexB) return -1;
+      }
+      return 0;
+    }
+
     let data = null;
     if (has.call(dataObj, 'data')) {
       data = []
       if (dataObj.data instanceof Array) {
+        let index = 1;
         for (let row of dataObj.data) {
-          data.push(row);
-        }
-      }
-      else if (dataObj.data instanceof Object) {
-        for (let row in dataObj.data) {
-          data.push(row);
+          let numberedRow = row.slice();
+          numberedRow.unshift(index);
+          data.push(numberedRow);
+          index++;
         }
       }
       else {
         data = null;
       }
     }
-    return data
+
+    return data == null ? data : data.sort(comparator);
   }
 
   static parseHeadings (dataObj) {

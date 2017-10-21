@@ -5,14 +5,16 @@ export default class DataEntry extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
-    style: PropTypes.object,
+    onClick: PropTypes.func,
+    style: PropTypes.object
   }
 
   render() {
     return (
       <div id={this.props.id}
            className={this.props.className}
-           style={this.props.style}>
+           style={this.props.style}
+           onClick={this.props.onClick}>
         {this.props.children}
       </div>
     )

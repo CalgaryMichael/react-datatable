@@ -43,8 +43,9 @@ export default class DataRow extends React.Component {
 
   renderRow() {
     return this.props.data.map((head, index) => {
-      const key = this.props.showRowNum ? index + 1 : index;
-      return this.renderEntry(head, key);
+      if (this.props.showRowNum || (!this.props.showRowNum && index != 0)) {
+        return this.renderEntry(head, index);
+      }
     });
   }
 
@@ -52,9 +53,6 @@ export default class DataRow extends React.Component {
     const className = `dt-row dt-row-${this.rowModulus()}`;
     const row = this.renderRow();
     let numCol = null;
-    if (this.props.showRowNum) {
-      numCol = this.renderEntry(this.props.rowNum, 0);
-    }
 
     return (
       <div id={this.props.id}

@@ -24,6 +24,7 @@ export default class DataHeader extends React.Component {
         key={index}
         id={`heading-${index}`}
         className={'dt-head'}
+        onClick={() => this.props.onClick(index)}
         style={this.props.colStyle}>
         {content}
       </DataEntry>
@@ -32,8 +33,7 @@ export default class DataHeader extends React.Component {
 
   renderRow() {
     return this.props.data.map((head, index) => {
-      const key = this.props.showRowNum ? index + 1 : index;
-      return this.renderEntry(head, key);
+      return this.renderEntry(head, (index + 1));
     });
   }
 
@@ -47,8 +47,7 @@ export default class DataHeader extends React.Component {
     return (
       <div id={this.props.id}
            style={this.props.rowStyle}
-           className={'dt-heading-row'}
-           onClick={this.props.onClick}>
+           className={'dt-heading-row'}>
         {numCol}
         {row}
       </div>
