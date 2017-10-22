@@ -33,22 +33,18 @@ export default class DataHeader extends React.Component {
 
   renderRow() {
     return this.props.data.map((head, index) => {
-      return this.renderEntry(head, (index + 1));
+      if (this.props.showRowNum || (!this.props.showRowNum && index != 0)) {
+        return this.renderEntry(head, index);
+      }
     });
   }
 
   render() {
     const row = this.renderRow();
-    let numCol = null;
-    if (this.props.showRowNum) {
-      numCol = this.renderEntry('Row', 0);
-    }
-
     return (
       <div id={this.props.id}
            style={this.props.rowStyle}
            className={'dt-heading-row'}>
-        {numCol}
         {row}
       </div>
     );

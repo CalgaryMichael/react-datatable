@@ -46,11 +46,12 @@ export default class Parser {
   static parseHeadings (dataObj) {
     let headings = null;
     if (has.call(dataObj, 'headings')) {
-      headings = dataObj.headings;
+      headings = dataObj.headings.slice();
     }
     else if (dataObj.data instanceof Object) {
       headings = Object.keys(dataObj);
     }
+    headings.unshift('Row');
     return headings;
   }
 }

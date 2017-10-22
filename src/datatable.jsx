@@ -8,9 +8,10 @@ import Styles from './styles.js';
 export default class DataTable extends React.Component {
   constructor(props) {
     super(props);
+    this._headings = null;
     this.state = {
       selectedRow: null,
-      sortedCol: 0,
+      sortedCol: null,
       sortDirection: 'asc'
     };
   }
@@ -20,6 +21,18 @@ export default class DataTable extends React.Component {
     title: PropTypes.string,
     data: PropTypes.object.isRequired,
     sortable: PropTypes.object,
+    defaultSortedCol: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+      PropTypes.arrayOf(
+        PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+        PropTypes.string
+      ),
+      PropTypes.shape({
+        column: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+        direction: PropTypes.string
+      })
+    ]),
     paginate: PropTypes.bool,
     pageLimit: PropTypes.number,
     onRowSelect: PropTypes.func,
@@ -58,6 +71,37 @@ export default class DataTable extends React.Component {
     return Object.assign({}, this.props.colStyle, Styles.baseCol);
   }
 
+  getSortedCol() {
+    function determineIndex(value, headings) {
+      return typeof value === 'string' ? headings.indexOf(value) : value;
+    }
+
+    let sortedIndex = 0;
+    let direction = 'asc';
+    if (this.state.sortedCol == null) {
+      if (this._headings == null) {
+        this._headings = Parser.parseHeadings(this.props.data);
+      }
+
+      if (this.props.defaultSortedCol instanceof Array) {
+        sortedIndex = determineIndex(this.props.defaultSortedCol[0], this._headings);
+        direction = this.props.defaultSortedCol[1];
+      }
+      else if (this.props.defaultSortedCol instanceof Object) {
+        sortedIndex = determineIndex(this.props.defaultSortedCol.column, this._headings);
+        direction = this.props.defaultSortedCol.direction;
+      }
+      else {
+        sortedIndex = determineIndex(this.props.defaultSortedCol, this._headings);
+      }
+    }
+    else {
+      sortedIndex = this.state.sortedCol;
+      direction = this.state.sortDirection;
+    }
+    return { sortedIndex, direction };
+  }
+
   onSelect(rowNum, rowData) {
     this.setState({selectedRow: rowNum});
     this.props.onRowSelect(rowNum, rowData);
@@ -75,14 +119,17 @@ export default class DataTable extends React.Component {
   }
 
   headings() {
-    const headings = Parser.parseHeadings(this.props.data);
-    if (headings == null) {
-      return null;
+    if (this._headings == null) {
+      const headings = Parser.parseHeadings(this.props.data);
+      if (headings == null) {
+        return null;
+      }
+      this._headings = headings;
     }
 
     return (
       <DataHeader
-        data={headings}
+        data={this._headings}
         onClick={(index) => this.onHeaderSelect(index)}
         rowStyle={this.getRowStyle()}
         colStyle={this.getColStyle()}
@@ -92,8 +139,9 @@ export default class DataTable extends React.Component {
 
   rows() {
     const colStyle = this.getColStyle();
-    const data = Parser.parseData(this.props.data, this.state.sortedCol, this.state.sortDirection);
-    if (data == false) {
+    const { sortedIndex, direction } = this.getSortedCol();
+    const data = Parser.parseData(this.props.data, sortedIndex, direction);
+    if (data == null) {
       return <span style={{textAlign: 'center'}}>No Data</span>;
     }
 
