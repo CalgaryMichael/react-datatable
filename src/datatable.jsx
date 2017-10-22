@@ -20,7 +20,10 @@ export default class DataTable extends React.Component {
     id: PropTypes.string,
     title: PropTypes.string,
     data: PropTypes.object.isRequired,
-    sortable: PropTypes.object,
+    sortable: PropTypes.bool,
+    unsortableCol: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
+    ),
     defaultSortedCol: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.string,
@@ -46,6 +49,8 @@ export default class DataTable extends React.Component {
     paginate: false,
     pageLimit: 10,
     showRowNum: true,
+    sortable: true,
+    unsortableCol: null,
     onRowSelect: () => {},
     rowStyle: {},
     colStyle: {}
@@ -108,14 +113,30 @@ export default class DataTable extends React.Component {
   }
 
   onHeaderSelect(colIndex) {
-    let direction = 'asc';
-    if (this.state.sortedCol === colIndex && this.state.sortDirection === 'asc') {
-      direction = 'desc';
+    if (this.props.sortable) {
+      const colHeader = this._headings[colIndex];
+      if (this.props.unsortableCol === null ||
+          this.props.unsortableCol.includes(colIndex) ||
+          this.props.unsortableCol.includes(colHeader)) {
+        let direction = null
+        if (this.state.sortedCol === null) {
+          let { sortedIndex, direction } = this.getSortedCol();
+          if (sortedIndex === colIndex && direction === 'asc') {
+            direction = 'desc';
+          }
+        }
+        else {
+          direction = 'asc';
+          if (this.state.sortedCol === colIndex && this.state.sortDirection === 'asc') {
+            direction = 'desc';
+          }
+        }
+        this.setState({
+          sortedCol: colIndex,
+          sortDirection: direction
+        });
+      }
     }
-    this.setState({
-      sortedCol: colIndex,
-      sortDirection: direction
-    });
   }
 
   headings() {
