@@ -54,4 +54,26 @@ export default class Parser {
     headings.unshift('Row');
     return headings;
   }
+
+  static filter(data, filterValue) {
+    let filteredData = [];
+    for (let row of data) {
+      for (let entry of row) {
+        if (typeof entry === 'string') {
+          entry = entry.toLowerCase();
+          if (entry.includes(filterValue.toLowerCase())) {
+            filteredData.push(row);
+            break;
+          }
+        }
+        else if (typeof entry === 'number' && !Number.isNaN(filterValue)) {
+          if (entry == filterValue) {
+            filteredData.push(row);
+            break;
+          }
+        }
+      }
+    }
+    return filteredData;
+  }
 }

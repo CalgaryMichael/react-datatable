@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import DataRow from './datarow.jsx';
 import DataHeader from './dataheader.jsx';
+import DataFilter from './datafilter.jsx';
 import Parser from './parser.js';
 import Styles from './styles.js';
 
@@ -12,14 +13,17 @@ export default class DataTable extends React.Component {
     this.state = {
       selectedRow: null,
       sortedCol: null,
-      sortDirection: 'asc'
+      sortDirection: 'asc',
+      filter: null
     };
+    this.onFilter = this.onFilter.bind(this);
   }
 
   static propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
     data: PropTypes.object.isRequired,
+    filterable: PropTypes.bool,
     sortable: PropTypes.bool,
     unsortableCol: PropTypes.arrayOf(
       PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
@@ -49,6 +53,7 @@ export default class DataTable extends React.Component {
     paginate: false,
     pageLimit: 10,
     showRowNum: true,
+    filterable: true,
     sortable: true,
     unsortableCol: null,
     onRowSelect: () => {},
@@ -57,7 +62,7 @@ export default class DataTable extends React.Component {
   };
 
   getTableStyles() {
-    return Object.assign({}, this.props.baseTable, Styles.baseTable);
+    return Object.assign({}, this.props.tableStyle, Styles.baseTable);
   }
 
   getRowStyle() {
@@ -139,6 +144,22 @@ export default class DataTable extends React.Component {
     }
   }
 
+  onFilter(value) {
+    this.setState({
+      filter: value
+    });
+  }
+
+  filter() {
+    if (this.props.filterable) {
+      return (
+        <DataFilter
+          text={this.props.filterText}
+          onChange={(value) => this.setState({filter: value})} />
+      )
+    }
+  }
+
   headings() {
     if (this._headings == null) {
       const headings = Parser.parseHeadings(this.props.data);
@@ -161,8 +182,12 @@ export default class DataTable extends React.Component {
   rows() {
     const colStyle = this.getColStyle();
     const { sortedIndex, direction } = this.getSortedCol();
-    const data = Parser.parseData(this.props.data, sortedIndex, direction);
-    if (data == null) {
+    let data = Parser.parseData(this.props.data, sortedIndex, direction);
+    if (this.props.filterable && this.state.filter) {
+      data = Parser.filter(data, this.state.filter);
+    }
+
+    if (data == null || data === []) {
       return <span style={{textAlign: 'center'}}>No Data</span>;
     }
 
@@ -183,13 +208,17 @@ export default class DataTable extends React.Component {
 
   render() {
     const style = this.getTableStyles();
+    const filter = this.filter();
     const heading = this.headings();
     const rows = this.rows();
 
     return (
-      <div id={this.props.id} className='dt-table' style={style}>
-        {heading}
-        {rows}
+      <div id={this.props.id} className='dt-outer'>
+        {filter}
+        <div className='dt-table' style={style}>
+          {heading}
+          {rows}
+        </div>
       </div>
     )
   };

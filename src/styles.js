@@ -12,4 +12,15 @@ export default class Styles {
     minWidth: '50px',
     paddingRight: '10px'
   }
+
+  static baseFilter = {
+    display: 'block',
+    margin: '0',
+    appearance: 'none',
+    border: 'none',
+    borderBottom: 'solid 1px #c9c9c9',
+    boxShadow: 'none',
+    borderRadius: 'none',
+    outline: 'none'
+  }
 }
