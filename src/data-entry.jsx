@@ -11,7 +11,7 @@ export default class DataEntry extends React.Component {
   }
 
   getStyle = () => {
-    return Object.assign({}, this.props.colStyle, Styles.baseCol);
+    return Object.assign({}, this.props.style, Styles.baseCol);
   }
 
   render() {

@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Parser from './parser.js';
 import Styles from './styles.js';
-import DataRow from './datarow.jsx';
-import DataHeader from './dataheader.jsx';
-import DataFilter from './datafilter.jsx';
+import DataRow from './data-row.jsx';
+import DataHeader from './data-header.jsx';
+import DataFilter from './data-filter.jsx';
 
 export default class DataTable extends React.Component {
   static propTypes = {
@@ -36,21 +36,24 @@ export default class DataTable extends React.Component {
     onRowSelect: PropTypes.func,
     showRowNum: PropTypes.bool,
     tableStyle: PropTypes.object,
+    headerStyle: PropTypes.object,
     rowStyle: PropTypes.object,
-    colStyle: PropTypes.object
+    entryStyle: PropTypes.object
   };
 
   static defaultProps = {
     paginate: false,
     pageLimit: 10,
-    showRowNum: true,
     filterable: true,
     unfilterableCol: [],
     sortable: true,
-    unsortableCol: null,
+    unsortableCol: [],
     onRowSelect: () => {},
+    showRowNum: true,
+    tableStyle: {},
+    headerStyle: {},
     rowStyle: {},
-    colStyle: {}
+    entryStyle: {}
   };
 
   constructor(props) {
@@ -76,10 +79,10 @@ export default class DataTable extends React.Component {
   onHeaderSelect = (colIndex) => {
     if (this.props.sortable) {
       const colHeader = this._headings[colIndex];
-      if (this.props.unsortableCol === null ||
+      if (!this.props.unsortableCol.length ||
           this.props.unsortableCol.includes(colIndex) ||
           this.props.unsortableCol.includes(colHeader)) {
-        let direction = null
+        let direction = 'asc';
         if (this.state.sortedCol === null) {
           const { sortedIndex, direction } = this.getSortedCol();
           if (sortedIndex === colIndex && direction === 'asc') {
@@ -87,7 +90,6 @@ export default class DataTable extends React.Component {
           }
         }
         else {
-          direction = 'asc';
           if (this.state.sortedCol === colIndex && this.state.sortDirection === 'asc') {
             direction = 'desc';
           }
@@ -160,8 +162,10 @@ export default class DataTable extends React.Component {
       <DataHeader
         data={this._headings}
         onClick={this.onHeaderSelect}
+        sortedCol={this.state.sortedCol}
+        sortDirection={this.state.sortDirection}
         rowStyle={this.props.rowStyle}
-        colStyle={this.props.colStyle}
+        entryStyle={this.props.headerStyle}
         showRowNum={this.props.showRowNum} />
     )
   };
@@ -195,7 +199,7 @@ export default class DataTable extends React.Component {
           selected={this.state.selectedRow === row[0]}
           onClick={() => this.onRowSelect(row)}
           rowStyle={this.props.rowStyle}
-          colStyle={this.props.colStyle}
+          entryStyle={this.props.entryStyle}
           rowNum={index}
           showRowNum={this.props.showRowNum} />
       )

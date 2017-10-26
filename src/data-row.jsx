@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Styles from './styles.js';
-import DataEntry from './dataentry.jsx';
+import DataEntry from './data-entry.jsx';
 
 export default class DataRow extends React.Component {
   static propTypes = {
@@ -9,8 +9,8 @@ export default class DataRow extends React.Component {
     data: PropTypes.array.isRequired,
     selected: PropTypes.bool,
     onClick: PropTypes.func,
-    colStyle: PropTypes.object,
     rowStyle: PropTypes.object,
+    entryStyle: PropTypes.object,
     rowNum: PropTypes.number,
     showRowNum: PropTypes.bool
   };
@@ -19,7 +19,7 @@ export default class DataRow extends React.Component {
     selected: false,
     showRowNum: true,
     rowStyle: {},
-    colStyle: {}
+    entryStyle: {}
   };
 
   constructor(props) {
@@ -36,23 +36,28 @@ export default class DataRow extends React.Component {
   }
 
   getStyle = () => {
-    let style = {};
+    let style = this.props.rowStyle;
     if (this.props.selected) {
-      style = {
-        backgroundColor: 'blue',
-        color: 'white'
-      };
+      if (this.props.rowStyle.focus) {
+        style = this.props.rowStyle.focus;
+      }
+      else if (this.props.rowStyle[':focus']) {
+        style = this.props.rowStyle[':focus'];
+      }
     }
     else if (this.state.hovered) {
-      style = {
-        backgroundColor: 'red',
-      };
+      if (this.props.rowStyle.hover) {
+        style = this.props.rowStyle.hover;
+      }
+      else if (this.props.rowStyle[':hover']) {
+        style = this.props.rowStyle[':hover'];
+      }
     }
-    return Object.assign(style, this.props.rowStyle, Styles.baseRow);
+    return Object.assign({}, style, Styles.baseRow);
   }
 
   getClassName = () => {
-    let className = `dt-row dt-row-${this.rowModulus()}`;
+    const className = `dt-row dt-row-${this.rowModulus()}`;
     if (this.props.selected) {
       return `${className} dt-row-selected`;
     }
@@ -78,7 +83,7 @@ export default class DataRow extends React.Component {
         key={index}
         id={`row-${rowNum}-col-${index}`}
         className={`dt-entry`}
-        style={this.props.colStyle}>
+        style={this.props.entryStyle}>
         {content}
       </DataEntry>
      );

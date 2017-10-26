@@ -26,6 +26,14 @@ export default class DataFilter extends React.Component {
     return Object.assign({}, this.props.style, Styles.baseFilter);
   }
 
+  getClassName = () => {
+    const className = 'dt-filter';
+    if (this.state.selected) {
+      return `${className} dt-filter-selected`;
+    }
+    return className
+  }
+
   onFilter = (event) => {
     const value = event.target.value;
     this.setState({value});
@@ -40,10 +48,7 @@ export default class DataFilter extends React.Component {
 
   render() {
     const style = this.getStyle();
-    let className = 'dt-filter';
-    if (this.state.selected) {
-      className += ' dt-filter-selected';
-    }
+    const className = this.getClassName();
 
     return (
       <div>
