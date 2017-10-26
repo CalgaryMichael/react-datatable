@@ -6,7 +6,7 @@ export default class DataFilter extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     style: PropTypes.object,
-    onChange: PropTypes.func.isRequired,
+    onFilter: PropTypes.func.isRequired,
     text: PropTypes.string
   }
 
@@ -26,15 +26,13 @@ export default class DataFilter extends React.Component {
     return Object.assign({}, this.props.style, Styles.baseFilter);
   }
 
-  handleChange(event) {
+  onFilter = (event) => {
     const value = event.target.value;
-    this.setState({
-      value: value
-    });
-    this.props.onChange(value);
+    this.setState({value});
+    this.props.onFilter(value);
   }
 
-  handleFocus() {
+  onFocus = () => {
     this.setState({
       selected: !this.state.selected
     });
@@ -56,9 +54,9 @@ export default class DataFilter extends React.Component {
           style={style}
           placeholder={this.props.text}
           value={this.state.value}
-          onChange={(event) => this.handleChange(event)}
-          onFocus={() => this.handleFocus()}
-          onBlur={() => this.handleFocus()} />
+          onChange={this.onFilter}
+          onFocus={this.onFucs}
+          onBlur={this.onFocus} />
       </div>
     );
   }

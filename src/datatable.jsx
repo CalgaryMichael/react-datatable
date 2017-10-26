@@ -1,24 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Parser from './parser.js';
+import Styles from './styles.js';
 import DataRow from './datarow.jsx';
 import DataHeader from './dataheader.jsx';
 import DataFilter from './datafilter.jsx';
-import Parser from './parser.js';
-import Styles from './styles.js';
 
 export default class DataTable extends React.Component {
-  constructor(props) {
-    super(props);
-    this._headings = null;
-    this.state = {
-      selectedRow: null,
-      sortedCol: null,
-      sortDirection: 'asc',
-      filter: null
-    };
-    this.onFilter = this.onFilter.bind(this);
-  }
-
   static propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
@@ -61,24 +49,57 @@ export default class DataTable extends React.Component {
     colStyle: {}
   };
 
-  getTableStyles() {
+  constructor(props) {
+    super(props);
+    this._headings = null;
+    this.state = {
+      selectedRow: null,
+      sortedCol: null,
+      sortDirection: 'asc',
+      filter: null
+    };
+  }
+
+  getStyle = () => {
     return Object.assign({}, this.props.tableStyle, Styles.baseTable);
   }
 
-  getRowStyle() {
-    return Object.assign({}, this.props.rowStyle, Styles.baseRow);
+  onRowSelect = (rowData) => {
+    this.setState({selectedRow: rowData[0]});
+    this.props.onRowSelect(rowData);
   }
 
-  getSelectedRowStyle() {
-    let selectedRowStyle = {
-      backgroundColor: 'blue',
-      color: 'white'
+  onHeaderSelect = (colIndex) => {
+    if (this.props.sortable) {
+      const colHeader = this._headings[colIndex];
+      if (this.props.unsortableCol === null ||
+          this.props.unsortableCol.includes(colIndex) ||
+          this.props.unsortableCol.includes(colHeader)) {
+        let direction = null
+        if (this.state.sortedCol === null) {
+          const { sortedIndex, direction } = this.getSortedCol();
+          if (sortedIndex === colIndex && direction === 'asc') {
+            direction = 'desc';
+          }
+        }
+        else {
+          direction = 'asc';
+          if (this.state.sortedCol === colIndex && this.state.sortDirection === 'asc') {
+            direction = 'desc';
+          }
+        }
+        this.setState({
+          sortedCol: colIndex,
+          sortDirection: direction
+        });
+      }
     }
-    return Object.assign(selectedRowStyle, this.props.rowStyle, Styles.baseRow);
   }
 
-  getColStyle() {
-    return Object.assign({}, this.props.colStyle, Styles.baseCol);
+  onFilter = (value) => {
+    this.setState({
+      filter: value
+    });
   }
 
   getSortedCol() {
@@ -112,55 +133,17 @@ export default class DataTable extends React.Component {
     return { sortedIndex, direction };
   }
 
-  onSelect(rowNum, rowData) {
-    this.setState({selectedRow: rowNum});
-    this.props.onRowSelect(rowNum, rowData);
-  }
-
-  onHeaderSelect(colIndex) {
-    if (this.props.sortable) {
-      const colHeader = this._headings[colIndex];
-      if (this.props.unsortableCol === null ||
-          this.props.unsortableCol.includes(colIndex) ||
-          this.props.unsortableCol.includes(colHeader)) {
-        let direction = null
-        if (this.state.sortedCol === null) {
-          let { sortedIndex, direction } = this.getSortedCol();
-          if (sortedIndex === colIndex && direction === 'asc') {
-            direction = 'desc';
-          }
-        }
-        else {
-          direction = 'asc';
-          if (this.state.sortedCol === colIndex && this.state.sortDirection === 'asc') {
-            direction = 'desc';
-          }
-        }
-        this.setState({
-          sortedCol: colIndex,
-          sortDirection: direction
-        });
-      }
-    }
-  }
-
-  onFilter(value) {
-    this.setState({
-      filter: value
-    });
-  }
-
-  filter() {
+  renderFilter() {
     if (this.props.filterable) {
       return (
         <DataFilter
           text={this.props.filterText}
-          onChange={(value) => this.setState({filter: value})} />
+          onFilter={this.onFilter} />
       )
     }
   }
 
-  headings() {
+  renderHeadings() {
     if (this._headings == null) {
       const headings = Parser.parseHeadings(this.props.data);
       if (headings == null) {
@@ -172,15 +155,14 @@ export default class DataTable extends React.Component {
     return (
       <DataHeader
         data={this._headings}
-        onClick={(index) => this.onHeaderSelect(index)}
-        rowStyle={this.getRowStyle()}
-        colStyle={this.getColStyle()}
+        onClick={this.onHeaderSelect}
+        rowStyle={this.props.rowStyle}
+        colStyle={this.props.colStyle}
         showRowNum={this.props.showRowNum} />
     )
   };
 
-  rows() {
-    const colStyle = this.getColStyle();
+  renderRows() {
     const { sortedIndex, direction } = this.getSortedCol();
     let data = Parser.parseData(this.props.data, sortedIndex, direction);
     if (this.props.filterable && this.state.filter) {
@@ -192,14 +174,14 @@ export default class DataTable extends React.Component {
     }
 
     return data.map((row, index) => {
-      const rowStyle = this.state.selectedRow == index ? this.getSelectedRowStyle() : this.getRowStyle();
       return (
         <DataRow
           key={index}
           data={row}
-          onClick={() => this.onSelect(index, row)}
-          rowStyle={rowStyle}
-          colStyle={colStyle}
+          selected={this.state.selectedRow === row[0]}
+          onClick={() => this.onRowSelect(row)}
+          rowStyle={this.props.rowStyle}
+          colStyle={this.props.colStyle}
           rowNum={index}
           showRowNum={this.props.showRowNum} />
       )
@@ -207,10 +189,10 @@ export default class DataTable extends React.Component {
   }
 
   render() {
-    const style = this.getTableStyles();
-    const filter = this.filter();
-    const heading = this.headings();
-    const rows = this.rows();
+    const style = this.getStyle();
+    const filter = this.renderFilter();
+    const heading = this.renderHeadings();
+    const rows = this.renderRows();
 
     return (
       <div id={this.props.id} className='dt-outer'>

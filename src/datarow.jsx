@@ -7,17 +7,59 @@ export default class DataRow extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     data: PropTypes.array.isRequired,
+    selected: PropTypes.bool,
     onClick: PropTypes.func,
     colStyle: PropTypes.object,
     rowStyle: PropTypes.object,
     rowNum: PropTypes.number,
     showRowNum: PropTypes.bool
-  }
+  };
 
   static defaultProps = {
+    selected: false,
     showRowNum: true,
     rowStyle: {},
     colStyle: {}
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      hovered: false
+    }
+  }
+
+  onHover = () => {
+    this.setState({
+      hovered: !this.state.hovered
+    });
+  }
+
+  getStyle = () => {
+    let style = {};
+    if (this.props.selected) {
+      style = {
+        backgroundColor: 'blue',
+        color: 'white'
+      };
+    }
+    else if (this.state.hovered) {
+      style = {
+        backgroundColor: 'red',
+      };
+    }
+    return Object.assign(style, this.props.rowStyle, Styles.baseRow);
+  }
+
+  getClassName = () => {
+    let className = `dt-row dt-row-${this.rowModulus()}`;
+    if (this.props.selected) {
+      return `${className} dt-row-selected`;
+    }
+    else if (this.state.hovered) {
+      return `${className} dt-row-hovered`;
+    }
+    return className
   }
 
   rowModulus() {
@@ -30,10 +72,11 @@ export default class DataRow extends React.Component {
   }
 
   renderEntry(content, index) {
+    const rowNum = this.props.data[0]
     return (
       <DataEntry
         key={index}
-        id={`row-${this.props.rowNum}-col-${index}`}
+        id={`row-${rowNum}-col-${index}`}
         className={`dt-entry`}
         style={this.props.colStyle}>
         {content}
@@ -50,16 +93,17 @@ export default class DataRow extends React.Component {
   }
 
   render() {
-    const className = `dt-row dt-row-${this.rowModulus()}`;
+    const className = this.getClassName();
+    const style = this.getStyle();
     const row = this.renderRow();
-    let numCol = null;
 
     return (
       <div id={this.props.id}
-           style={this.props.rowStyle}
+           style={style}
            className={className}
-           onClick={this.props.onClick}>
-        {numCol}
+           onClick={this.props.onClick}
+           onMouseEnter={this.onHover}
+           onMouseLeave={this.onHover}>
         {row}
       </div>
     )

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Styles from './styles.js'
 import DataEntry from './dataentry.jsx'
 
 export default class DataHeader extends React.Component {
@@ -16,6 +17,10 @@ export default class DataHeader extends React.Component {
   static defaultProps = {
     rowStyle: {},
     colStyle: {}
+  }
+
+  getStyle = () => {
+    return Object.assign({}, this.props.rowStyle, Styles.baseRow);
   }
 
   renderEntry(content, index) {
@@ -40,10 +45,12 @@ export default class DataHeader extends React.Component {
   }
 
   render() {
+    const style = this.getStyle();
     const row = this.renderRow();
+
     return (
       <div id={this.props.id}
-           style={this.props.rowStyle}
+           style={style}
            className={'dt-heading-row'}>
         {row}
       </div>
