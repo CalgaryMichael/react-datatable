@@ -22,7 +22,7 @@ export default class DataFilter extends React.Component {
     };
   }
 
-  getStyle() {
+  getStyle = () => {
     return Object.assign({}, this.props.style, Styles.baseFilter);
   }
 

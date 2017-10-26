@@ -12,6 +12,9 @@ export default class DataTable extends React.Component {
     title: PropTypes.string,
     data: PropTypes.object.isRequired,
     filterable: PropTypes.bool,
+    unfilterableCol: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
+    ),
     sortable: PropTypes.bool,
     unsortableCol: PropTypes.arrayOf(
       PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
@@ -42,6 +45,7 @@ export default class DataTable extends React.Component {
     pageLimit: 10,
     showRowNum: true,
     filterable: true,
+    unfilterableCol: [],
     sortable: true,
     unsortableCol: null,
     onRowSelect: () => {},
@@ -166,7 +170,17 @@ export default class DataTable extends React.Component {
     const { sortedIndex, direction } = this.getSortedCol();
     let data = Parser.parseData(this.props.data, sortedIndex, direction);
     if (this.props.filterable && this.state.filter) {
-      data = Parser.filter(data, this.state.filter);
+      let unfilterableCol = [];
+      for (let entry of this.props.unfilterableCol) {
+        if (typeof entry === 'number') {
+          unfilterableCol.push(entry);
+        }
+        else {
+          const entryLoc = this._headings.indexOf(entry);
+          unfilterableCol.push(entryLoc);
+        }
+      }
+      data = Parser.filter(data, this.state.filter, unfilterableCol);
     }
 
     if (data == null || data === []) {
