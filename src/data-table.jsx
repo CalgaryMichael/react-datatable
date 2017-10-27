@@ -77,22 +77,21 @@ export default class DataTable extends React.Component {
   }
 
   onHeaderSelect = (colIndex) => {
+    function reverseDirection (direction) {
+      return direction === 'asc' ? 'desc' : 'asc';
+    }
+
     if (this.props.sortable) {
       const colHeader = this._headings[colIndex];
       if (!this.props.unsortableCol.length ||
-          this.props.unsortableCol.includes(colIndex) ||
-          this.props.unsortableCol.includes(colHeader)) {
-        let direction = 'asc';
-        if (this.state.sortedCol === null) {
-          const { sortedIndex, direction } = this.getSortedCol();
-          if (sortedIndex === colIndex && direction === 'asc') {
-            direction = 'desc';
-          }
+          !this.props.unsortableCol.includes(colIndex) ||
+          !this.props.unsortableCol.includes(colHeader)) {
+        let { sortedIndex, direction } = this.getSortedCol();
+        if (sortedIndex === colIndex) {
+          direction = reverseDirection(direction);
         }
         else {
-          if (this.state.sortedCol === colIndex && this.state.sortDirection === 'asc') {
-            direction = 'desc';
-          }
+          direction = 'asc';
         }
         this.setState({
           sortedCol: colIndex,
@@ -120,16 +119,18 @@ export default class DataTable extends React.Component {
         this._headings = Parser.parseHeadings(this.props.data);
       }
 
-      if (this.props.defaultSortedCol instanceof Array) {
-        sortedIndex = determineIndex(this.props.defaultSortedCol[0], this._headings);
-        direction = this.props.defaultSortedCol[1];
-      }
-      else if (this.props.defaultSortedCol instanceof Object) {
-        sortedIndex = determineIndex(this.props.defaultSortedCol.column, this._headings);
-        direction = this.props.defaultSortedCol.direction;
-      }
-      else {
-        sortedIndex = determineIndex(this.props.defaultSortedCol, this._headings);
+      if (this.props.defaultSortedCol) {
+        if (this.props.defaultSortedCol instanceof Array) {
+          sortedIndex = determineIndex(this.props.defaultSortedCol[0], this._headings);
+          direction = this.props.defaultSortedCol[1];
+        }
+        else if (this.props.defaultSortedCol instanceof Object) {
+          sortedIndex = determineIndex(this.props.defaultSortedCol.column, this._headings);
+          direction = this.props.defaultSortedCol.direction;
+        }
+        else {
+          sortedIndex = determineIndex(this.props.defaultSortedCol, this._headings);
+        }
       }
     }
     else {

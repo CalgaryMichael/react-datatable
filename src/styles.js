@@ -7,6 +7,15 @@ export default class Styles {
     display: 'table-row'
   }
 
+  static baseHeader = {
+    display: 'table-row',
+    userSelect: 'none',
+    MozUserSelect: 'none',
+    MsUserSelect: 'none',
+    WebkitUserSelect: 'none',
+    WebkitTouchUserSelect: 'none',
+  }
+
   static baseCol = {
     display: 'table-cell',
     minWidth: '50px',

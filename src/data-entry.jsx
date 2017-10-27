@@ -10,6 +10,10 @@ export default class DataEntry extends React.Component {
     style: PropTypes.object
   }
 
+  static defaultProps = {
+    className: 'dt-entry'
+  }
+
   getStyle = () => {
     return Object.assign({}, this.props.style, Styles.baseCol);
   }

@@ -82,7 +82,6 @@ export default class DataRow extends React.Component {
       <DataEntry
         key={index}
         id={`row-${rowNum}-col-${index}`}
-        className={`dt-entry`}
         style={this.props.entryStyle}>
         {content}
       </DataEntry>

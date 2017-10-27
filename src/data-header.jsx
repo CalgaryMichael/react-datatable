@@ -26,13 +26,6 @@ export default class DataHeader extends React.Component {
     return Object.assign({}, this.props.rowStyle, Styles.baseRow);
   }
 
-  getSorting = (index) => {
-    if (this.props.sortedCol == null) {
-      return index == 0;
-    }
-    return this.props.sortedCol === index;
-  }
-
   getEntryStyle = (index) => {
     const calcSortStyle  = (direction) => {
       if (direction === 'asc') {
@@ -67,16 +60,27 @@ export default class DataHeader extends React.Component {
         style = calcSortStyle(this.props.sortDirection);
       }
     }
-    return Object.assign({}, style, Styles.baseRow);
+    return Object.assign({}, style, Styles.baseHeader);
+  }
+
+  getClassName = (index) => {
+    const className = 'dt-head';
+    const uninitializedCol = this.props.showRowNum && this.props.sortedCol == null && index === 0;
+    if (this.props.sortedCol == index || uninitializedCol) {
+      return `${className} dt-sorted-${this.props.sortDirection}`;
+    }
+    return className;
   }
 
   renderEntry(content, index) {
     const style = this.getEntryStyle(index);
+    const className = this.getClassName(index);
+
     return (
       <DataEntry
         key={index}
         id={`heading-${index}`}
-        className={'dt-head'}
+        className={className}
         onClick={() => this.props.onClick(index)}
         style={style}>
         {content}

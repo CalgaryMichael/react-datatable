@@ -18,7 +18,7 @@ export default class DataFilter extends React.Component {
     super(props);
     this.state = {
       value: '',
-      selected: false
+      focused: false
     };
   }
 
@@ -28,8 +28,8 @@ export default class DataFilter extends React.Component {
 
   getClassName = () => {
     const className = 'dt-filter';
-    if (this.state.selected) {
-      return `${className} dt-filter-selected`;
+    if (this.state.focused) {
+      return `${className} dt-filter-focused`;
     }
     return className
   }
@@ -42,7 +42,7 @@ export default class DataFilter extends React.Component {
 
   onFocus = () => {
     this.setState({
-      selected: !this.state.selected
+      focused: !this.state.focused
     });
   }
 
