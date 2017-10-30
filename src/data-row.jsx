@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { selectRow } from './state/actions.js';
 import Styles from './styles.js';
 import DataEntry from './data-entry.jsx';
 
@@ -27,6 +28,11 @@ export default class DataRow extends React.Component {
     this.state = {
       hovered: false
     }
+  }
+
+  onClick = () => {
+    selectRow(this.props.data);
+    this.props.onClick(this.props.data);
   }
 
   onHover = () => {
@@ -105,7 +111,7 @@ export default class DataRow extends React.Component {
       <div id={this.props.id}
            style={style}
            className={className}
-           onClick={this.props.onClick}
+           onClick={this.onClick}
            onMouseEnter={this.onHover}
            onMouseLeave={this.onHover}>
         {row}

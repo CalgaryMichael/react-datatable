@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ActionStore from './state/store.js';
 import Parser from './parser.js';
 import Styles from './styles.js';
 import DataRow from './data-row.jsx';
@@ -59,21 +60,17 @@ export default class DataTable extends React.Component {
   constructor(props) {
     super(props);
     this._headings = null;
-    this.state = {
-      selectedRow: null,
-      sortedCol: null,
-      sortDirection: 'asc',
-      filter: null
-    };
+    ActionStore.initializeState(this.props.data);
+    this.state = ActionStore.getState();
+    ActionStore.addChangeListener(this.handleStoreChange);
   }
+
+  handleStoreChange = () => {
+    this.setState(ActionStore.getState());
+  };
 
   getStyle = () => {
     return Object.assign({}, this.props.tableStyle, Styles.baseTable);
-  }
-
-  onRowSelect = (rowData) => {
-    this.setState({selectedRow: rowData[0]});
-    this.props.onRowSelect(rowData);
   }
 
   onHeaderSelect = (colIndex) => {
@@ -198,7 +195,7 @@ export default class DataTable extends React.Component {
           key={index}
           data={row}
           selected={this.state.selectedRow === row[0]}
-          onClick={() => this.onRowSelect(row)}
+          onClick={this.props.onRowSelect}
           rowStyle={this.props.rowStyle}
           entryStyle={this.props.entryStyle}
           rowNum={index}
