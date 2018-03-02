@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Styles from './styles.js'
-import DataEntry from './data-entry.jsx'
+import Styles from './styles.js';
+import DataEntry from './data-entry.jsx';
 
 export default class DataHeader extends React.Component {
   static propTypes = {
