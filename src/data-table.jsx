@@ -12,6 +12,7 @@ export default class DataTable extends React.Component {
     title: PropTypes.string,
     data: PropTypes.object.isRequired,
     filterable: PropTypes.bool,
+    placeholderFilterText: PropTypes.string,
     onFilter: PropTypes.func,
     unfilterableCol: PropTypes.arrayOf(
       PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
@@ -35,6 +36,7 @@ export default class DataTable extends React.Component {
     paginate: PropTypes.bool,
     pageLimit: PropTypes.number,
     onRowSelect: PropTypes.func,
+    onRowHover: PropTypes.func,
     showRowNum: PropTypes.bool,
     titleStyle: PropTypes.object,
     tableStyle: PropTypes.object,
@@ -47,11 +49,13 @@ export default class DataTable extends React.Component {
     paginate: false,
     pageLimit: 10,
     filterable: true,
+    placeholderFilterText: 'Filter...',
     onFilter: () => {},
     unfilterableCol: [],
     sortable: true,
     unsortableCol: [],
     onRowSelect: () => {},
+    onRowHover: () => {},
     showRowNum: true,
     titleStyle: {},
     tableStyle: {},
@@ -65,6 +69,7 @@ export default class DataTable extends React.Component {
     this._headings = null;
     this.state = {
       selectedRow: null,
+      hoveredRow: null,
       sortedCol: null,
       sortDirection: 'asc',
       filter: '',
@@ -92,23 +97,29 @@ export default class DataTable extends React.Component {
    *  ======================
    */
 
-  onRowSelect = (rowData) => {
+  onRowSelect = (event, rowData) => {
     this.setState({selectedRow: rowData[0]});
-    this.props.onRowSelect(rowData);
-  }
+    this.props.onRowSelect(event, rowData);
+  };
+
+  onRowHover = (event, rowData, leaving=false) => {
+    const rowNum = leaving ? null : rowData[0];
+    this.setState({hoveredRow: rowNum});
+    this.props.onRowHover(event, rowData, leaving);
+  };
 
   onFilter = (event) => {
     this.setState({
       filter: event.target.value
     });
     this.props.onFilter(event);
-  }
+  };
 
   onFilterFocus = (event) => {
     this.setState({
       focused: !this.state.focused
     });
-  }
+  };
 
   onHeaderSelect = (colIndex) => {
     function reverseDirection (direction) {
@@ -133,7 +144,7 @@ export default class DataTable extends React.Component {
         });
       }
     }
-  }
+  };
 
   getSortedCol() {
     function determineIndex(value, headings) {
@@ -179,7 +190,8 @@ export default class DataTable extends React.Component {
       return (
         <DataFilter
           value={this.state.filter}
-          placeHolderText={this.props.filterText}
+          focused={this.state.focused}
+          placeHolderText={this.props.placeholderFilterText}
           onFilter={this.onFilter}
           onFocus={this.onFilterFocus} />
       )
@@ -234,7 +246,9 @@ export default class DataTable extends React.Component {
           key={index}
           data={row}
           selected={this.state.selectedRow === row[0]}
-          onClick={() => this.onRowSelect(row)}
+          onClick={this.onRowSelect}
+          hovered={this.state.hoveredRow === row[0]}
+          onHover={this.onRowHover}
           rowStyle={this.props.rowStyle}
           entryStyle={this.props.entryStyle}
           rowNum={index}

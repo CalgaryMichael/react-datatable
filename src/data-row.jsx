@@ -9,6 +9,8 @@ export default class DataRow extends React.Component {
     data: PropTypes.array.isRequired,
     selected: PropTypes.bool,
     onClick: PropTypes.func,
+    hovered: PropTypes.bool,
+    onHover: PropTypes.func,
     rowStyle: PropTypes.object,
     entryStyle: PropTypes.object,
     rowNum: PropTypes.number,
@@ -17,23 +19,13 @@ export default class DataRow extends React.Component {
 
   static defaultProps = {
     selected: false,
+    onClick: () => {},
+    hovered: false,
+    onHover: () => {},
     showRowNum: true,
     rowStyle: {},
     entryStyle: {}
   };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      hovered: false
-    }
-  }
-
-  onHover = () => {
-    this.setState({
-      hovered: !this.state.hovered
-    });
-  }
 
   getStyle = () => {
     let style = this.props.rowStyle;
@@ -45,7 +37,7 @@ export default class DataRow extends React.Component {
         style = this.props.rowStyle[':focus'];
       }
     }
-    else if (this.state.hovered) {
+    else if (this.props.hovered) {
       if (this.props.rowStyle.hover) {
         style = this.props.rowStyle.hover;
       }
@@ -57,12 +49,12 @@ export default class DataRow extends React.Component {
   }
 
   getClassName = () => {
-    const className = `dt-row dt-row-${this.rowModulus()}`;
+    let className = `dt-row dt-row-${this.rowModulus()}`;
     if (this.props.selected) {
-      return `${className} dt-row-selected`;
+      className += ' dt-row-selected';
     }
-    else if (this.state.hovered) {
-      return `${className} dt-row-hovered`;
+    if (this.props.hovered) {
+      className += ' dt-row-hovered';
     }
     return className
   }
@@ -105,9 +97,9 @@ export default class DataRow extends React.Component {
       <div id={this.props.id}
            style={style}
            className={className}
-           onClick={this.props.onClick}
-           onMouseEnter={this.onHover}
-           onMouseLeave={this.onHover}>
+           onClick={(e) => this.props.onClick(e, this.props.data)}
+           onMouseEnter={(e) => this.props.onHover(e, this.props.data)}
+           onMouseLeave={(e) => this.props.onHover(e, this.props.data, true)}>
         {row}
       </div>
     )
