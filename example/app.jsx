@@ -4,14 +4,14 @@ import DataTable from '../src/data-table.jsx';
 export default class App extends React.Component {
   render() {
     const data = {
-      'headings': ['First Name', 'Last Name'],
+      'headings': ['First Name', 'Last Name', 'Instrument'],
       'data': [
-        ['Miles', 'Davis'],
-        ['John', 'Coltrane'],
-        ['Ornette', 'Coleman'],
-        ['Nina', 'Simone'],
-        ['Sonny', 'Rollins'],
-        ['Kamasi', 'Washington']
+        ['Miles', 'Davis', 'Trumpet'],
+        ['John', 'Coltrane', 'Saxophone'],
+        ['Ornette', 'Coleman', 'Saxophone'],
+        ['Nina', 'Simone', 'Vocals & Piano'],
+        ['Sonny', 'Rollins', 'Saxophone'],
+        ['Kamasi', 'Washington', 'Saxophone']
       ]
     }
 
@@ -38,6 +38,7 @@ export default class App extends React.Component {
      <DataTable
        id='dt'
        data={data}
+       title='Example Table'
        headerStyle={headerStyle}
        rowStyle={rowStyle}
        showRowNum={true} />

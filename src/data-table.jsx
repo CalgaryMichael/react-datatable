@@ -35,6 +35,7 @@ export default class DataTable extends React.Component {
     pageLimit: PropTypes.number,
     onRowSelect: PropTypes.func,
     showRowNum: PropTypes.bool,
+    titleStyle: PropTypes.object,
     tableStyle: PropTypes.object,
     headerStyle: PropTypes.object,
     rowStyle: PropTypes.object,
@@ -50,6 +51,7 @@ export default class DataTable extends React.Component {
     unsortableCol: [],
     onRowSelect: () => {},
     showRowNum: true,
+    titleStyle: {},
     tableStyle: {},
     headerStyle: {},
     rowStyle: {},
@@ -69,6 +71,10 @@ export default class DataTable extends React.Component {
 
   getStyle = () => {
     return Object.assign({}, this.props.tableStyle, Styles.baseTable);
+  }
+
+  getTitleStyle = () => {
+    return Object.assign({}, this.props.titleStyle, Styles.baseTitle);
   }
 
   onRowSelect = (rowData) => {
@@ -209,16 +215,24 @@ export default class DataTable extends React.Component {
 
   render() {
     const style = this.getStyle();
+    const titleStyle = this.getTitleStyle();
     const filter = this.renderFilter();
     const heading = this.renderHeadings();
     const rows = this.renderRows();
 
     return (
       <div id={this.props.id} className='dt-outer'>
-        {filter}
         <div className='dt-table' style={style}>
-          {heading}
-          {rows}
+          <div style={{display: 'table-caption'}}>
+            <div style={Styles.baseCaption}>
+              <div style={titleStyle}>{this.props.title}</div>
+              {filter}
+            </div>
+          </div>
+          <div style={{display: 'table-row-group'}}>
+            {heading}
+            {rows}
+          </div>
         </div>
       </div>
     )

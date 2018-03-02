@@ -1,4 +1,15 @@
 export default class Styles {
+  static baseCaption = {
+    display: 'flex',
+    flexDirection: 'flex-start',
+    justifyContent: 'space-between'
+  }
+
+  static baseTitle = {
+    display: 'inline-block',
+    fontWeight: 'bold'
+  }
+
   static baseTable = {
     display: 'table'
   }
@@ -23,7 +34,7 @@ export default class Styles {
   }
 
   static baseFilter = {
-    display: 'block',
+    display: 'inline-block',
     margin: '0',
     appearance: 'none',
     border: 'none',
