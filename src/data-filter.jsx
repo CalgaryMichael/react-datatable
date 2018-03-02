@@ -5,21 +5,18 @@ import Styles from './styles.js';
 export default class DataFilter extends React.Component {
   static propTypes = {
     id: PropTypes.string,
+    value: PropTypes.string,
+    focused: PropTypes.string,
     style: PropTypes.object,
     onFilter: PropTypes.func.isRequired,
-    text: PropTypes.string
+    onFocus: PropTypes.func,
+    placeHolderText: PropTypes.string
   }
 
   static defaultProps = {
-    text: 'Filter...'
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: '',
-      focused: false
-    };
+    value: '',
+    placeHolderText: 'Filter...',
+    onFocus: () => {}
   }
 
   getStyle = () => {
@@ -28,22 +25,10 @@ export default class DataFilter extends React.Component {
 
   getClassName = () => {
     const className = 'dt-filter';
-    if (this.state.focused) {
+    if (this.props.focused) {
       return `${className} dt-filter-focused`;
     }
     return className
-  }
-
-  onFilter = (event) => {
-    const value = event.target.value;
-    this.setState({value});
-    this.props.onFilter(value);
-  }
-
-  onFocus = () => {
-    this.setState({
-      focused: !this.state.focused
-    });
   }
 
   render() {
@@ -57,11 +42,11 @@ export default class DataFilter extends React.Component {
           id={this.props.id}
           className={className}
           style={style}
-          placeholder={this.props.text}
-          value={this.state.value}
-          onChange={this.onFilter}
-          onFocus={this.onFucs}
-          onBlur={this.onFocus} />
+          placeholder={this.props.placeHolderText}
+          value={this.props.value}
+          onChange={(e) => this.props.onFilter(e)}
+          onFocus={(e) => this.props.onFocus(e)}
+          onBlur={(e) => this.props.onFocus(e)} />
       </div>
     );
   }

@@ -12,6 +12,7 @@ export default class DataTable extends React.Component {
     title: PropTypes.string,
     data: PropTypes.object.isRequired,
     filterable: PropTypes.bool,
+    onFilter: PropTypes.func,
     unfilterableCol: PropTypes.arrayOf(
       PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
     ),
@@ -46,6 +47,7 @@ export default class DataTable extends React.Component {
     paginate: false,
     pageLimit: 10,
     filterable: true,
+    onFilter: () => {},
     unfilterableCol: [],
     sortable: true,
     unsortableCol: [],
@@ -65,9 +67,16 @@ export default class DataTable extends React.Component {
       selectedRow: null,
       sortedCol: null,
       sortDirection: 'asc',
-      filter: null
+      filter: '',
+      focused: false
     };
   }
+
+  /**
+   *  ======================
+   *  =   Style Managers   =
+   *  ======================
+   */
 
   getStyle = () => {
     return Object.assign({}, this.props.tableStyle, Styles.baseTable);
@@ -77,9 +86,28 @@ export default class DataTable extends React.Component {
     return Object.assign({}, this.props.titleStyle, Styles.baseTitle);
   }
 
+  /**
+   *  ======================
+   *  =   Event Managers   =
+   *  ======================
+   */
+
   onRowSelect = (rowData) => {
     this.setState({selectedRow: rowData[0]});
     this.props.onRowSelect(rowData);
+  }
+
+  onFilter = (event) => {
+    this.setState({
+      filter: event.target.value
+    });
+    this.props.onFilter(event);
+  }
+
+  onFilterFocus = (event) => {
+    this.setState({
+      focused: !this.state.focused
+    });
   }
 
   onHeaderSelect = (colIndex) => {
@@ -105,12 +133,6 @@ export default class DataTable extends React.Component {
         });
       }
     }
-  }
-
-  onFilter = (value) => {
-    this.setState({
-      filter: value
-    });
   }
 
   getSortedCol() {
@@ -146,12 +168,20 @@ export default class DataTable extends React.Component {
     return { sortedIndex, direction };
   }
 
+  /**
+   *  =======================
+   *  =   Render Managers   =
+   *  =======================
+   */
+
   renderFilter() {
     if (this.props.filterable) {
       return (
         <DataFilter
-          text={this.props.filterText}
-          onFilter={this.onFilter} />
+          value={this.state.filter}
+          placeHolderText={this.props.filterText}
+          onFilter={this.onFilter}
+          onFocus={this.onFilterFocus} />
       )
     }
   }
