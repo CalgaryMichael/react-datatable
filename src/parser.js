@@ -1,7 +1,6 @@
 import { has, unique, convertCamelCase } from './utils';
 
-
-const parseData = (dataObj, sortIndex=0, sortDirection='asc') => {
+const parseData = (data, sortIndex=0, sortDirection='asc') => {
   function comparator (a, b) {
     let indexA = a[sortIndex],
         indexB = b[sortIndex];
@@ -12,37 +11,28 @@ const parseData = (dataObj, sortIndex=0, sortDirection='asc') => {
       indexB = indexB.toLowerCase();
     }
 
-    if (sortDirection === 'asc') {
-      if (indexA < indexB) return -1;
-      if (indexA > indexB) return 1;
-    }
-    else {
+    if (sortDirection === 'desc') {
       if (indexA < indexB) return 1;
       if (indexA > indexB) return -1;
+    }
+    else {
+      if (indexA < indexB) return -1;
+      if (indexA > indexB) return 1;
     }
     return 0;
   }
 
-  let data = null;
-  if (has.call(dataObj, 'data')) {
-    data = []
-    if (dataObj.data instanceof Array) {
-      let index = 1;
-      for (let row of dataObj.data) {
-        let numberedRow = row.slice();
-        numberedRow.unshift(index);
-        data.push(numberedRow);
-        index++;
-      }
-    }
-    else {
-      data = null;
-    }
+  let parsedData = [];
+  let index = 1;
+  for (let row of data) {
+    let numberedRow = Array.isArray(row) ? row.slice() : Object.values(row);
+    numberedRow.unshift(index);
+    parsedData.push(numberedRow);
+    index++;
   }
 
-  return data == null ? data : data.sort(comparator);
+  return parsedData.sort(comparator);
 };
-
 
 const parseHeadings = (dataObj) => {
   let headings = [];
@@ -67,7 +57,6 @@ const parseHeadings = (dataObj) => {
   return unique(headings);
 };
 
-
 const convertHeadingsTitle = (headings) => {
   let newHeadings = [];
   for (let heading of headings) {
@@ -76,15 +65,15 @@ const convertHeadingsTitle = (headings) => {
   return newHeadings;
 };
 
-
 const filter = (data, filterValue, unfilterable) => {
   let filteredData = [];
+  filterValue = String(filterValue).toLowerCase()
   for (let row of data) {
     for (let [i, entry] of row.entries()) {
       if (!unfilterable.includes(i)) {
         if (typeof entry === 'string') {
           entry = entry.toLowerCase();
-          if (entry.includes(filterValue.toLowerCase())) {
+          if (entry.includes(filterValue)) {
             filteredData.push(row);
             break;
           }
@@ -100,6 +89,5 @@ const filter = (data, filterValue, unfilterable) => {
   }
   return filteredData;
 };
-
 
 export const Parser = { parseData, parseHeadings, filter }

@@ -221,7 +221,7 @@ export default class DataTable extends React.Component {
 
   renderRows() {
     const { sortedIndex, direction } = this.getSortedCol();
-    let data = Parser.parseData(this.props.data, sortedIndex, direction);
+    let data = Parser.parseData(this.props.data.data, sortedIndex, direction);
     if (this.props.filterable && this.state.filter) {
       let unfilterableCol = [];
       for (let entry of this.props.unfilterableCol) {
