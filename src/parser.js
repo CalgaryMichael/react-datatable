@@ -70,6 +70,10 @@ const convertHeadingsTitle = (headings) => {
 };
 
 const filter = (data, filterValue, unfilterable) => {
+  if (!filterValue) {
+    return data;
+  }
+
   let filteredData = [];
   filterValue = String(filterValue).toLowerCase()
   for (let row of data) {
