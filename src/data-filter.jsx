@@ -6,7 +6,7 @@ export default class DataFilter extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     value: PropTypes.string,
-    focused: PropTypes.string,
+    focused: PropTypes.bool,
     style: PropTypes.object,
     onFilter: PropTypes.func.isRequired,
     onFocus: PropTypes.func,

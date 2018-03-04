@@ -1,13 +1,26 @@
 import { has, unique, convertCamelCase } from './utils';
 
-const parseData = (data, sortIndex=0, sortDirection='asc') => {
+const parseData = (data) => {
+  let parsedData = [];
+  let index = 1;
+  for (let row of data) {
+    let numberedRow = Array.isArray(row) ? row.slice() : Object.values(row);
+    numberedRow.unshift(index);
+    parsedData.push(numberedRow);
+    index++;
+  }
+
+  return parsedData
+};
+
+const sort = (data, sortIndex=0, sortDirection='asc') => {
   function comparator (a, b) {
     let indexA = a[sortIndex],
         indexB = b[sortIndex];
     if (indexA instanceof String) {
       indexA = indexA.toLowerCase();
     }
-    else if (indexB instanceof String) {
+    if (indexB instanceof String) {
       indexB = indexB.toLowerCase();
     }
 
@@ -22,16 +35,7 @@ const parseData = (data, sortIndex=0, sortDirection='asc') => {
     return 0;
   }
 
-  let parsedData = [];
-  let index = 1;
-  for (let row of data) {
-    let numberedRow = Array.isArray(row) ? row.slice() : Object.values(row);
-    numberedRow.unshift(index);
-    parsedData.push(numberedRow);
-    index++;
-  }
-
-  return parsedData.sort(comparator);
+  return data.sort(comparator)
 };
 
 const parseHeadings = (dataObj) => {
@@ -90,4 +94,4 @@ const filter = (data, filterValue, unfilterable) => {
   return filteredData;
 };
 
-export const Parser = { parseData, parseHeadings, filter }
+export const Parser = { parseData, sort, parseHeadings, filter }

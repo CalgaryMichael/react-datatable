@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Parser from './parser.js';
+import { Parser } from './parser.js';
 import Styles from './styles.js';
 import DataRow from './data-row.jsx';
 import DataHeader from './data-header.jsx';
@@ -66,12 +66,18 @@ export default class DataTable extends React.Component {
 
   constructor(props) {
     super(props);
-    this._headings = null;
+    const data = Parser.parseData(this.props.data.data);
+    const headings = Parser.parseHeadings(this.props.data);
+    const { sortedIndex, direction } = this.getDeafultSortedCol(headings);
+
     this.state = {
+      rawData: data,
+      displayData: data,
+      headings: headings,
       selectedRow: null,
       hoveredRow: null,
-      sortedCol: null,
-      sortDirection: 'asc',
+      sortedCol: sortedIndex,
+      sortDirection: direction,
       filter: '',
       focused: false
     };
@@ -127,18 +133,19 @@ export default class DataTable extends React.Component {
     }
 
     if (this.props.sortable) {
-      const colHeader = this._headings[colIndex];
+      const colHeader = this.state.headings[colIndex];
       if (!this.props.unsortableCol.length ||
           !this.props.unsortableCol.includes(colIndex) ||
           !this.props.unsortableCol.includes(colHeader)) {
-        let { sortedIndex, direction } = this.getSortedCol();
-        if (sortedIndex === colIndex) {
+        let direction = this.state.sortDirection;
+        if (this.state.sortedCol === colIndex) {
           direction = reverseDirection(direction);
         }
         else {
           direction = 'asc';
         }
         this.setState({
+          displayData: Parser.sort(this.state.rawData, colIndex, direction),
           sortedCol: colIndex,
           sortDirection: direction
         });
@@ -146,35 +153,25 @@ export default class DataTable extends React.Component {
     }
   };
 
-  getSortedCol() {
-    function determineIndex(value, headings) {
+  getDeafultSortedCol(headings) {
+    function determineIndex(value) {
       return typeof value === 'string' ? headings.indexOf(value) : value;
     }
 
     let sortedIndex = 0;
     let direction = 'asc';
-    if (this.state.sortedCol == null) {
-      if (this._headings == null) {
-        this._headings = Parser.parseHeadings(this.props.data);
+    if (this.props.defaultSortedCol) {
+      if (this.props.defaultSortedCol instanceof Array) {
+        sortedIndex = determineIndex(this.props.defaultSortedCol[0], headings);
+        direction = this.props.defaultSortedCol[1];
       }
-
-      if (this.props.defaultSortedCol) {
-        if (this.props.defaultSortedCol instanceof Array) {
-          sortedIndex = determineIndex(this.props.defaultSortedCol[0], this._headings);
-          direction = this.props.defaultSortedCol[1];
-        }
-        else if (this.props.defaultSortedCol instanceof Object) {
-          sortedIndex = determineIndex(this.props.defaultSortedCol.column, this._headings);
-          direction = this.props.defaultSortedCol.direction;
-        }
-        else {
-          sortedIndex = determineIndex(this.props.defaultSortedCol, this._headings);
-        }
+      else if (this.props.defaultSortedCol instanceof Object) {
+        sortedIndex = determineIndex(this.props.defaultSortedCol.column, headings);
+        direction = this.props.defaultSortedCol.direction;
       }
-    }
-    else {
-      sortedIndex = this.state.sortedCol;
-      direction = this.state.sortDirection;
+      else {
+        sortedIndex = determineIndex(this.props.defaultSortedCol, headings);
+      }
     }
     return { sortedIndex, direction };
   }
@@ -199,29 +196,22 @@ export default class DataTable extends React.Component {
   }
 
   renderHeadings() {
-    if (this._headings == null) {
-      const headings = Parser.parseHeadings(this.props.data);
-      if (headings == null) {
-        return null;
-      }
-      this._headings = headings;
+    if (this.state.headings) {
+      return (
+        <DataHeader
+          data={this.state.headings}
+          onClick={this.onHeaderSelect}
+          sortedCol={this.state.sortedCol}
+          sortDirection={this.state.sortDirection}
+          rowStyle={this.props.rowStyle}
+          entryStyle={this.props.headerStyle}
+          showRowNum={this.props.showRowNum} />
+      );
     }
-
-    return (
-      <DataHeader
-        data={this._headings}
-        onClick={this.onHeaderSelect}
-        sortedCol={this.state.sortedCol}
-        sortDirection={this.state.sortDirection}
-        rowStyle={this.props.rowStyle}
-        entryStyle={this.props.headerStyle}
-        showRowNum={this.props.showRowNum} />
-    )
   };
 
   renderRows() {
-    const { sortedIndex, direction } = this.getSortedCol();
-    let data = Parser.parseData(this.props.data.data, sortedIndex, direction);
+    let data = this.state.displayData;
     if (this.props.filterable && this.state.filter) {
       let unfilterableCol = [];
       for (let entry of this.props.unfilterableCol) {
@@ -229,7 +219,7 @@ export default class DataTable extends React.Component {
           unfilterableCol.push(entry);
         }
         else {
-          const entryLoc = this._headings.indexOf(entry);
+          const entryLoc = this.state.headings.indexOf(entry);
           unfilterableCol.push(entryLoc);
         }
       }
